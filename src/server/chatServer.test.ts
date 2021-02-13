@@ -3,7 +3,9 @@ import socketIO from "socket.io";
 import http from "http"
 import { io as clientIo } from "socket.io-client";
 
-const PORT_NUMBER = 4000
+import type { UploadFile, UploadFileRequest } from "../shared/types";
+
+const PORT_NUMBER = 5000
 describe('채팅 서버 테스트', () => {
   let httpServer:http.Server, socketServer:socketIO.Server;
 
@@ -21,6 +23,39 @@ describe('채팅 서버 테스트', () => {
     done()
   })
 
+  it('파일 리스트에 파일 등록하기', (done) => {
+    const testFileName = "testFile"
+    const client = connectClient();
+    client.on('getUploadFileList', (fileList: UploadFile[]) => {
+      expect(fileList).toBeTruthy();
+      expect(fileList.length).toBe(1);
+      expect(fileList[0].fileName).toBe(testFileName);
+      expect(fileList[0].owner).toBe(client.id);
+      done();
+    })
+    client.emit('registerUploadFile', testFileName);
+  });
+
+  it('파일 다운로드 요청하기', (done) => {
+    const testFile = "testFile";
+    const owner = connectClient();
+    const requester = connectClient();
+    owner.on('uploadFile', handleUploadFile);
+    owner.emit('registerUploadFile', testFile);
+    requester.on('getUploadFileList', function(){
+      requester.emit('downloadFile', {
+        owner: owner.id,
+        fileName: testFile,
+      });
+    })
+    
+    function handleUploadFile(uploadFileReq: UploadFileRequest){
+      expect(uploadFileReq.fileName).toBe(testFile);
+      expect(uploadFileReq.requester).toBe(requester.id);
+      done();
+    }
+  })
+
   function connectClient(){
     return clientIo(`http://localhost:${PORT_NUMBER}`)
   }
@@ -30,7 +65,7 @@ describe('채팅 서버 테스트', () => {
       httpServer = newHttpServer;
       socketServer = newSocketServer;
       done();
-    })
+    });
   }
 
   function closeServer(done: jest.DoneCallback){

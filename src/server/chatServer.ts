@@ -3,11 +3,14 @@ import express from "express";
 import path from "path"
 import http from "http"
 
+import uploadFileManager from "./uploadFileManager";
+import { UploadFile } from "../shared/types";
+
 interface CreateServerConfig {
   port: number;
 }
 
-const publicFolderPath = path.resolve(__dirname, '../public');
+const publicFolderPath = path.resolve(__dirname, '../../public');
 
 export type HttpServer = http.Server;
 export type SocketServer = socketIo.Server;
@@ -45,6 +48,28 @@ function createSocketServer(server: http.Server){
 
 function addSocketListener(socketServer: socketIo.Server){
   socketServer.on('connection', (socket:Socket) => {
-    console.log("A socket connected");
+    socket.join('publicRoom')
+    socket.on('registerUploadFile', (fileName: string) => {
+      console.log("registerUploadFile fileName : ", fileName);
+      uploadFileManager.registerFile({fileName, owner: socket.id});
+      emitUploadFileList();
+    });
+
+    socket.on('getUploadFileList', () => {
+      console.log("getUploadFileList");
+      emitUploadFileList();
+    });
+
+    socket.on('downloadFile', (uploadFile:UploadFile) => {
+      console.log("downloadFile", uploadFile);
+      socket.to(uploadFile.owner).emit('uploadFile', {
+        fileName: uploadFile.fileName,
+        requester: socket.id,
+      });
+    });
+
+    function emitUploadFileList(){
+      socketServer.to('publicRoom').emit('getUploadFileList', uploadFileManager.getFiles());
+    }
   })
 }

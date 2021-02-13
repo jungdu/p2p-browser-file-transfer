@@ -5,11 +5,36 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    #uploadFileTable{
+      max-width: 900px;
+      margin: 50px auto 0;
+      border: 1px solid #bbb;
+      padding: 10px;
+    }
+    #uploadFileTable td{
+      width: 200px;
+    }
+  </style>
 </head>
 <body>
-  <input type="text" name="" id="nameIpt">
-  <input type="file" name="" id="fileInput">
-  <button id="uploadBtn">전송준비</button>
+  <input type="file" id="fileInput">
+  <button id="registerFileBtn">전송준비</button>
+
+  <table id="uploadFileTable">
+    <thead>
+      <tr>
+        <th>Owner</th>
+        <th>File Name</th>
+        <th>Download</th>
+      </tr>
+    </thead>
+    <tbody id="uploadFileListTbody">
+
+    </tbody>
+  </table>
+
+
   <script src="./bundle.js"></script>
 </body>
 </html>
