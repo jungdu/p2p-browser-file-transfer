@@ -13,6 +13,7 @@ export default class ReceiveBuffer{
     a.style.display = 'none';
     a.href = url
     a.download = fileName;
+    document.body.appendChild(a);
     a.click();
     setTimeout(() => {
       document.body.removeChild(a);
