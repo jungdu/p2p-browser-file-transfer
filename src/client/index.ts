@@ -7,6 +7,7 @@ import {uploadFileManager} from "./UploadFileManager"
 const fileInput = document.getElementById("fileInput") as HTMLInputElement;
 const registerFileBtn = document.getElementById("registerFileBtn") as HTMLButtonElement;
 const uploadFileListTbody = document.getElementById("uploadFileListTbody") as HTMLElement;
+const socketId = document.getElementById("socketId") as HTMLElement;
 
 let socket:Socket | null = null;
 let connectionManager:RTCConnectionManager| null = null;
@@ -43,10 +44,14 @@ registerFileBtn.addEventListener("click", () => {
 
 function connectSocket(){
   socket = io("http://localhost:4000");
+  
+  socket.on('connect', () => {
+    socketId.innerText = getCurrentSocket().id;
+  });
+
   connectionManager = new RTCConnectionManager(socket)
   socket.on('getUploadFileList', handleGetUploadFileList)
   socket.emit('getUploadFileList');
-
   function handleGetUploadFileList(files:UploadFile[]){
     console.log("handleGetUploadFileList");
     uploadFileListTbody.innerHTML = ""

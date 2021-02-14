@@ -4,15 +4,20 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>P2P 파일 공유</title>
   <style>
     #fileForm{
       max-width: 700px;
       margin: 60px auto 0;
     }
 
-    #uploadFileTable{
+    #socketIdContainer{
+      max-width: 700px;
       margin: 30px auto 0;
+    }
+
+    #uploadFileTable{
+      margin: 10px auto 0;
       border: 1px solid #ccc;
       padding: 10px;
     }
@@ -24,6 +29,7 @@
     }
     #uploadFileTable th:nth-child(1){
       width: 200px;
+      padding: 0 10px;
     }
     #uploadFileTable th:nth-child(2){
       width: 400px;
@@ -38,6 +44,7 @@
     <input type="file" id="fileInput">
     <button id="registerFileBtn">파일 등록</button>
   </div>
+  <div id="socketIdContainer">Socket ID: <b id="socketId">disconnected</b></div>
   <table id="uploadFileTable">
     <thead>
       <tr>
@@ -49,8 +56,6 @@
     <tbody id="uploadFileListTbody">
     </tbody>
   </table>
-
-
   <script src="./bundle.js"></script>
 </body>
 </html>
