@@ -2,10 +2,11 @@ import { io, Socket } from "socket.io-client"
 import { UploadFile } from "../shared/types"
 import RTCConnectionManager from "./RTCConnectionManager";
 
+import {uploadFileManager} from "./UploadFileManager"
+
 const fileInput = document.getElementById("fileInput") as HTMLInputElement;
 const registerFileBtn = document.getElementById("registerFileBtn") as HTMLButtonElement;
 const uploadFileListTbody = document.getElementById("uploadFileListTbody") as HTMLElement;
-const registeredFiles:File[] = [];
 
 let socket:Socket | null = null;
 let connectionManager:RTCConnectionManager| null = null;
@@ -31,7 +32,7 @@ function getConnectionManager(){
 registerFileBtn.addEventListener("click", () => {
   const fileToUpload = fileInput.files && fileInput.files[0];
   if(fileToUpload){
-    registeredFiles.push(fileToUpload);
+    uploadFileManager.setFile(fileToUpload);
     getCurrentSocket().emit('registerUploadFile', fileToUpload.name);
   }
 });
@@ -71,39 +72,3 @@ function connectSocket(){
     })
   }
 }
-
-// uploadBtn.addEventListener("click", () => {
-//   const fileToUpload = fileInput.files && fileInput.files[0];
-//   if(fileToUpload){
-//     readFile(fileToUpload, (blob) => {
-//       console.log("readed blob :", blob)
-//     })
-//   }else{
-//     console.error("No file input to upload");
-//   }
-// })
-
-// function readFile(file:File, onGetChunk: (blob: ArrayBuffer) => void){
-//   const chunkSize = 16384;
-//   const fileReader = new FileReader();
-//   let offset = 0;
-//   fileReader.addEventListener('load', event => {
-//     if(event && event.target && event.target.result instanceof ArrayBuffer){
-//       onGetChunk(event.target.result);
-//       offset += event.target.result.byteLength;
-//       if (offset < file.size) {
-//         readSlicedBlob(offset)
-//       }
-//     }
-//   });
-//   readSlicedBlob(0);
-
-//   function readSlicedBlob(offset:number){
-//     const slicedBlob = getSliceBlob(offset);
-//     fileReader.readAsArrayBuffer(slicedBlob);
-//   }
-
-//   function getSliceBlob(offset:number){
-//     return file.slice(offset, offset + chunkSize);
-//   }
-// }

@@ -1,5 +1,8 @@
 import { Socket } from "socket.io-client";
 import { DownloadCandidateReq, RequesterCandidateRes, DownloadOfferReq, DownloadOfferRes, OwnerCandidateReq, OwnerCandidateRes, DownloadAnswerReq, DownloadAnswerRes } from "../shared/types";
+import ReceiveBuffer from "./ReceiveBuffer";
+
+import {uploadFileManager} from "./UploadFileManager"
 
 let iceServers = {
   iceServers: [
@@ -37,8 +40,14 @@ export default class RTCConnectionManager {
       console.log("received event.channel :", event.channel);
       const dataChannel = event.channel;
       dataChannel.binaryType = 'arraybuffer';
-      // TODO dataChannel 통해서 파일 보내기
-      dataChannel.send('connected');
+      uploadFileManager.readFile(fileName, {
+        onData: (data) => {
+          dataChannel.send(data);
+        },
+        onFinish: () => {
+          dataChannel.close();
+        }
+      })
     })
 
     rtcPeerConnection.addEventListener('icecandidate', (event) => {
@@ -70,21 +79,27 @@ export default class RTCConnectionManager {
     });
   }
 
-  private createDataChanel = (peerConnection: RTCPeerConnection) => {
+  private createDataChanel = (peerConnection: RTCPeerConnection, fileName: string) => {
     const sendChannel = peerConnection.createDataChannel('sendDataChanel');
     sendChannel.binaryType = 'arraybuffer';
     console.log("Created send data channel");
 
+    const receiveBuffer = new ReceiveBuffer();
+
     sendChannel.addEventListener('message', (event) => {
-      // TODO 파일 메세지 모아서 파일로 저장하기
+      receiveBuffer.push(event.data);
       console.log("dataChannel message ", event.data);
     })
+
     sendChannel.addEventListener('open', () => {
       console.log("dataChannel opened");
     })
+
     sendChannel.addEventListener('close', () => {
       console.log("dataChannel closed");
+      receiveBuffer.download(fileName);
     })
+
     sendChannel.addEventListener('error', (error) => {
       console.log("dataChannel error ", error);
     })
@@ -173,7 +188,7 @@ export default class RTCConnectionManager {
     });
 
     this.addRequesterPeerListeners(rtcPeerConnection, fileName, owner);
-    this.createDataChanel(rtcPeerConnection);
+    this.createDataChanel(rtcPeerConnection, fileName);
 
     const offer = await rtcPeerConnection.createOffer();
     rtcPeerConnection.setLocalDescription(offer);
