@@ -56,6 +56,7 @@ function connectSocket(){
       const downloadBtn = document.createElement('button');
       downloadBtn.addEventListener('click', handleClickDownloadBtn);
       downloadBtn.innerText = "download";
+      downloadBtn.disabled = file.owner === getCurrentSocket().id;
       downloadTd.appendChild(downloadBtn);
       tr.appendChild(ownerTd);
       tr.appendChild(fileNameTd);
