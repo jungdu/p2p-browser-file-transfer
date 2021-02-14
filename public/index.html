@@ -6,31 +6,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
+    #fileForm{
+      max-width: 700px;
+      margin: 60px auto 0;
+    }
+
     #uploadFileTable{
-      max-width: 900px;
-      margin: 50px auto 0;
-      border: 1px solid #bbb;
+      margin: 30px auto 0;
+      border: 1px solid #ccc;
       padding: 10px;
     }
+    #uploadFileTable thead tr{
+      height: 30px;
+    }
     #uploadFileTable td{
+      vertical-align: top;
+    }
+    #uploadFileTable td:nth-child(1){
       width: 200px;
+    }
+    #uploadFileTable td:nth-child(2){
+      width: 400px;
+    }
+    #uploadFileTable td:nth-child(3){
+      width: 100px;
     }
   </style>
 </head>
 <body>
-  <input type="file" id="fileInput">
-  <button id="registerFileBtn">전송준비</button>
-
+  <div id="fileForm">
+    <input type="file" id="fileInput">
+    <button id="registerFileBtn">파일 등록</button>
+  </div>
   <table id="uploadFileTable">
     <thead>
       <tr>
         <th>Owner</th>
         <th>File Name</th>
-        <th>Download</th>
       </tr>
     </thead>
     <tbody id="uploadFileListTbody">
-
     </tbody>
   </table>
 
