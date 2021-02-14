@@ -4,7 +4,7 @@ import path from "path"
 import http from "http"
 
 import uploadFileManager from "./uploadFileManager";
-import { UploadFile } from "../shared/types";
+import { DownloadCandidateReq, RequesterCandidateRes, DownloadOfferReq, DownloadOfferRes, OwnerCandidateReq, OwnerCandidateRes, DownloadAnswerReq, DownloadAnswerRes } from "../shared/types";
 
 interface CreateServerConfig {
   port: number;
@@ -60,13 +60,56 @@ function addSocketListener(socketServer: socketIo.Server){
       emitUploadFileList();
     });
 
-    socket.on('downloadFile', (uploadFile:UploadFile) => {
-      console.log("downloadFile", uploadFile);
-      socket.to(uploadFile.owner).emit('uploadFile', {
-        fileName: uploadFile.fileName,
+    socket.on('requesterCandidate', ({
+      candidate,
+      fileName,
+      owner,
+    }:DownloadCandidateReq) =>{
+      console.log("requesterCandidate");
+      const data: RequesterCandidateRes = {
+        candidate,
+        fileName,
+        requester: socket.id
+      }
+      socket.to(owner).emit("requesterCandidate", data)
+    })
+
+    socket.on('downloadOffer', ({
+      fileName,
+      owner,
+      offer
+    }: DownloadOfferReq) =>{
+      console.log("downloadOffer")
+      const downloadOfferRes: DownloadOfferRes = {
+        fileName,
+        offer,
         requester: socket.id,
-      });
+      }
+      socket.to(owner).emit('downloadOffer', downloadOfferRes)
     });
+
+    socket.on('downloadAnswer', ({answer, fileName, requester}: DownloadAnswerReq) => {
+      const downloadAnswerRes:DownloadAnswerRes = {
+        answer,
+        owner: socket.id,
+        fileName
+      }
+      socket.to(requester).emit('downloadAnswer', downloadAnswerRes)
+    });
+
+    socket.on('ownerCandidate', ({
+      candidate,
+      fileName,
+      requester
+    }: OwnerCandidateReq) => {
+      console.log("ownerCandidate");
+      const ownerCandidateRes:OwnerCandidateRes = {
+        candidate,
+        fileName,
+        owner: socket.id
+      }
+      socket.to(requester).emit('ownerCandidate', ownerCandidateRes);
+    })
 
     function emitUploadFileList(){
       socketServer.to('publicRoom').emit('getUploadFileList', uploadFileManager.getFiles());

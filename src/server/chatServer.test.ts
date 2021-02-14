@@ -3,7 +3,7 @@ import socketIO from "socket.io";
 import http from "http"
 import { io as clientIo } from "socket.io-client";
 
-import type { UploadFile, UploadFileRequest } from "../shared/types";
+import type { UploadFile } from "../shared/types";
 
 const PORT_NUMBER = 5000
 describe('채팅 서버 테스트', () => {
@@ -35,26 +35,6 @@ describe('채팅 서버 테스트', () => {
     })
     client.emit('registerUploadFile', testFileName);
   });
-
-  it('파일 다운로드 요청하기', (done) => {
-    const testFile = "testFile";
-    const owner = connectClient();
-    const requester = connectClient();
-    owner.on('uploadFile', handleUploadFile);
-    owner.emit('registerUploadFile', testFile);
-    requester.on('getUploadFileList', function(){
-      requester.emit('downloadFile', {
-        owner: owner.id,
-        fileName: testFile,
-      });
-    })
-    
-    function handleUploadFile(uploadFileReq: UploadFileRequest){
-      expect(uploadFileReq.fileName).toBe(testFile);
-      expect(uploadFileReq.requester).toBe(requester.id);
-      done();
-    }
-  })
 
   function connectClient(){
     return clientIo(`http://localhost:${PORT_NUMBER}`)

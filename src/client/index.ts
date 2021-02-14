@@ -1,12 +1,14 @@
 import { io, Socket } from "socket.io-client"
-import {UploadFile, UploadFileRequest} from "../shared/types"
+import { UploadFile } from "../shared/types"
+import RTCConnectionManager from "./RTCConnectionManager";
 
 const fileInput = document.getElementById("fileInput") as HTMLInputElement;
 const registerFileBtn = document.getElementById("registerFileBtn") as HTMLButtonElement;
 const uploadFileListTbody = document.getElementById("uploadFileListTbody") as HTMLElement;
-const ownFileList:File[] = [];
+const registeredFiles:File[] = [];
 
 let socket:Socket | null = null;
+let connectionManager:RTCConnectionManager| null = null;
 
 connectSocket();
 
@@ -18,26 +20,30 @@ function getCurrentSocket(){
   }
 }
 
+function getConnectionManager(){
+  if(connectionManager){
+    return connectionManager;
+  }else{
+    throw new Error("No connection manager")
+  }
+}
+
 registerFileBtn.addEventListener("click", () => {
   const fileToUpload = fileInput.files && fileInput.files[0];
   if(fileToUpload){
-    ownFileList.push(fileToUpload);
+    registeredFiles.push(fileToUpload);
     getCurrentSocket().emit('registerUploadFile', fileToUpload.name);
   }
 });
 
 function connectSocket(){
   socket = io("http://localhost:4000");
+  connectionManager = new RTCConnectionManager(socket)
   socket.on('getUploadFileList', handleGetUploadFileList)
-  socket.on('uploadFile', handleUploadFile)
   socket.emit('getUploadFileList');
 
-  
-  function handleUploadFile(uploadFileReq:UploadFileRequest){
-    console.log("uploadRequest :", uploadFileReq)
-  }
-
   function handleGetUploadFileList(files:UploadFile[]){
+    console.log("handleGetUploadFileList");
     uploadFileListTbody.innerHTML = ""
     files.forEach((file) => {
       const tr = document.createElement('tr');
@@ -60,11 +66,11 @@ function connectSocket(){
           owner: file.owner,
           fileName: file.fileName
         });
+        getConnectionManager().downloadFile(file.owner, file.fileName);
       }
     })
   }
 }
-
 
 // uploadBtn.addEventListener("click", () => {
 //   const fileToUpload = fileInput.files && fileInput.files[0];
