@@ -15,6 +15,10 @@ class UploadFileManager{
       throw new Error("No file to return");
     }
   }
+  
+  hasFile = (fileName: string) => {
+    return !!this.files.get(fileName);
+  }
 
   readFile = (fileName: string, callback: {
     onData: (data: ArrayBuffer) => void;
@@ -32,7 +36,7 @@ class UploadFileManager{
         offset += event.target.result.byteLength;
         if (offset < file.size) {
           readSlicedBlob(offset)
-        }else{
+        } else {
           callback.onFinish();
         }
       }

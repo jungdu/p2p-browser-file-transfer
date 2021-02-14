@@ -32,8 +32,12 @@ function getConnectionManager(){
 registerFileBtn.addEventListener("click", () => {
   const fileToUpload = fileInput.files && fileInput.files[0];
   if(fileToUpload){
-    uploadFileManager.setFile(fileToUpload);
-    getCurrentSocket().emit('registerUploadFile', fileToUpload.name);
+    if(!uploadFileManager.hasFile(fileToUpload.name)){
+      uploadFileManager.setFile(fileToUpload);
+      getCurrentSocket().emit('registerUploadFile', fileToUpload.name);
+    }else{
+      alert('이미 등록된 파일입니다.');
+    }
   }
 });
 
@@ -64,6 +68,7 @@ function connectSocket(){
       uploadFileListTbody.appendChild(tr);
 
       function handleClickDownloadBtn(){
+        downloadBtn.disabled = true;
         getCurrentSocket().emit('downloadFile', {
           owner: file.owner,
           fileName: file.fileName
