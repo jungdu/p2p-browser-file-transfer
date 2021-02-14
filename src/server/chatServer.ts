@@ -3,7 +3,7 @@ import express from "express";
 import path from "path"
 import http from "http"
 
-import uploadFileManager from "./uploadFileManager";
+import uploadFileList from "./uploadFileList";
 import { DownloadCandidateReq, RequesterCandidateRes, DownloadOfferReq, DownloadOfferRes, OwnerCandidateReq, OwnerCandidateRes, DownloadAnswerReq, DownloadAnswerRes } from "../shared/types";
 
 interface CreateServerConfig {
@@ -49,9 +49,15 @@ function createSocketServer(server: http.Server){
 function addSocketListener(socketServer: socketIo.Server){
   socketServer.on('connection', (socket:Socket) => {
     socket.join('publicRoom')
+
+    socket.on('disconnect', () => {
+      uploadFileList.deleteFiles(socket.id);
+      emitUploadFileList();
+    })
+
     socket.on('registerUploadFile', (fileName: string) => {
       console.log("registerUploadFile fileName : ", fileName);
-      uploadFileManager.registerFile({fileName, owner: socket.id});
+      uploadFileList.registerFile({fileName, owner: socket.id});
       emitUploadFileList();
     });
 
@@ -112,7 +118,7 @@ function addSocketListener(socketServer: socketIo.Server){
     })
 
     function emitUploadFileList(){
-      socketServer.to('publicRoom').emit('getUploadFileList', uploadFileManager.getFiles());
+      socketServer.to('publicRoom').emit('getUploadFileList', uploadFileList.getFiles());
     }
   })
 }

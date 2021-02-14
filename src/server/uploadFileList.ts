@@ -1,12 +1,10 @@
 import {UploadFile} from "../shared/types"
 
-class UploadFileManager {
+class UploadFileList {
   fileList:UploadFile[] = []
 
   deleteFiles(owner: string){
-    this.fileList = this.fileList.filter((file) => {
-      file.owner !== owner
-    });
+    this.fileList = this.fileList.filter((file) => file.owner !== owner);
   }
 
   getFiles(){
@@ -18,4 +16,4 @@ class UploadFileManager {
   }
 }
 
-export default new UploadFileManager();
+export default new UploadFileList();
