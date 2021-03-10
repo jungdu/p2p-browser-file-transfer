@@ -24,6 +24,9 @@ export function createServer({
   }>(resolve => {
       const serverPort = port || 4000;
       const app = express();
+      app.get('/ping', function(req, res) {
+        res.send('pong');
+      });
       const server = app.listen(serverPort, handleListen);
       app.use(express.static(publicFolderPath));
       const ioServer = createSocketServer(server);
