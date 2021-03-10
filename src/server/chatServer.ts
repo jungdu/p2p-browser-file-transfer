@@ -6,7 +6,7 @@ import uploadFileList from "./uploadFileList";
 import { DownloadCandidateReq, RequesterCandidateRes, DownloadOfferReq, DownloadOfferRes, OwnerCandidateReq, OwnerCandidateRes, DownloadAnswerReq, DownloadAnswerRes } from "../shared/types";
 
 interface CreateServerConfig {
-  port: number;
+  port?: number | string;
 }
 
 const publicFolderPath = 'public'
@@ -16,23 +16,22 @@ export type SocketServer = socketIo.Server;
 
 export function createServer({
   port
-}:CreateServerConfig = {
-  port: 4000,
-}){
+}:CreateServerConfig){
   return new Promise<{
     httpServer: http.Server,
     socketServer: socketIo.Server,
-    port: number,
+    port: number | string,
   }>(resolve => {
+      const serverPort = port || 4000;
       const app = express();
-      const server = app.listen(port, handleListen);
+      const server = app.listen(serverPort, handleListen);
       app.use(express.static(publicFolderPath));
       const ioServer = createSocketServer(server);
       function handleListen(){
         resolve({
           socketServer: ioServer,
           httpServer: server,
-          port
+          port:serverPort,
         })
       }
     }
