@@ -5,12 +5,12 @@
   "license": "MIT",
   "scripts": {
     "start": "node build/index.js",
-    "dev": "concurrently \"yarn build:client --watch\" \"yarn dev:server\"",
+    "dev": "concurrently \"yarn dev:client --watch\" \"yarn dev:server\"",
     "dev:client": "webpack --config ./webpack.config.client.js --watch",
     "dev:server": "nodemon --watch src --delay 1 --exec 'ts-node' src/server/index.ts",
     "build": "yarn build:client && yarn build:server",
-    "build:client": "webpack --config ./webpack.config.client.js",
-    "build:server": "webpack --config ./webpack.config.server.js",
+    "build:client": "webpack --config ./webpack.config.client.js --mode=production",
+    "build:server": "webpack --config ./webpack.config.server.js --mode=production",
     "test": "jest"
   },
   "devDependencies": {
@@ -35,6 +35,7 @@
     "webpack-cli": "^4.5.0"
   },
   "dependencies": {
+    "dotenv": "^8.2.0",
     "socket.io-client": "^3.1.1"
   }
 }

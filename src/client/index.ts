@@ -43,7 +43,8 @@ registerFileBtn.addEventListener("click", () => {
 });
 
 function connectSocket(){
-  socket = io("http://localhost:4000");
+  console.log("Connecting to Socket Server : ", process.env.SOCKET_URL)
+  socket = io(process.env.SOCKET_URL as string);
   
   socket.on('connect', () => {
     socketId.innerText = getCurrentSocket().id;
