@@ -1,6 +1,5 @@
 import socketIo, { Socket } from "socket.io"
 import express from "express";
-import path from "path"
 import http from "http"
 
 import uploadFileList from "./uploadFileList";
@@ -10,7 +9,7 @@ interface CreateServerConfig {
   port: number;
 }
 
-const publicFolderPath = path.resolve(__dirname, '../../public');
+const publicFolderPath = 'public'
 
 export type HttpServer = http.Server;
 export type SocketServer = socketIo.Server;

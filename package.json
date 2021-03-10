@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "start": "node build/index.js",
     "dev": "concurrently \"yarn build:client --watch\" \"yarn dev:server\"",
     "dev:client": "webpack --config ./webpack.config.client.js --watch",
     "dev:server": "nodemon --watch src --delay 1 --exec 'ts-node' src/server/index.ts",
